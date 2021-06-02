@@ -24,7 +24,7 @@ class BINARYNINJAUIAPI FilterEdit: public QLineEdit
 	FilterTarget* m_target;
 
 public:
-	FilterEdit(QWidget* parent, FilterTarget* target);
+	FilterEdit(FilterTarget* target);
 
 protected:
 	virtual void keyPressEvent(QKeyEvent* event) override;
@@ -37,9 +37,12 @@ class BINARYNINJAUIAPI FilteredView: public QWidget
 	FilterTarget* m_target;
 	QWidget* m_widget;
 	FilterEdit* m_filter;
+	bool m_autoHide;
 
 public:
-	FilteredView(QWidget* parent, QWidget* filtered, FilterTarget* target);
+	FilteredView(QWidget* parent, QWidget* filtered, FilterTarget* target,
+		FilterEdit* edit = nullptr);
+	void setFilterPlaceholderText(const QString& text);
 	void updateFonts();
 	void clearFilter();
 	void showFilter(const QString& initialText);

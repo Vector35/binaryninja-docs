@@ -548,6 +548,7 @@ void ByteView::repositionCaret()
 	m_cursorTimer->start();
 	updateCaret();
 	UIContext::updateStatus();
+	updateCrossReferenceSelection();
 }
 
 
@@ -817,6 +818,7 @@ void ByteView::selectAll()
 	m_cursorAddr = getEnd();
 	viewport()->update();
 	UIContext::updateStatus();
+	updateCrossReferenceSelection();
 }
 
 

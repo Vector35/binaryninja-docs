@@ -1655,7 +1655,15 @@ extern "C"
 		FeatureMapFunctionColor,
 		FeatureMapImportColor,
 		FeatureMapExternColor,
-		FeatureMapLibraryColor
+		FeatureMapLibraryColor,
+
+		// Sidebar colors
+		SidebarBackgroundColor,
+		SidebarInactiveIconColor,
+		SidebarActiveIconColor,
+		SidebarHeaderBackgroundColor,
+		SidebarHeaderTextColor,
+		SidebarWidgetBackgroundColor
 	};
 
 	// The following edge styles map to QT's Qt::PenStyle enumeration

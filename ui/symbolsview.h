@@ -2,17 +2,16 @@
 
 #include <QtCore/QTimer>
 #include "binaryninjaapi.h"
-#include "dockhandler.h"
+#include "sidebar.h"
 #include "filter.h"
 #include "symbollist.h"
 
 class ViewFrame;
 class SymbolList;
 
-class BINARYNINJAUIAPI SymbolsView: public QWidget, public DockContextHandler, public BinaryNinja::BinaryDataNotification
+class BINARYNINJAUIAPI SymbolsView: public SidebarWidget, public BinaryNinja::BinaryDataNotification
 {
 	Q_OBJECT
-	Q_INTERFACES(DockContextHandler)
 
 	friend class SymbolList;
 
@@ -20,6 +19,7 @@ class BINARYNINJAUIAPI SymbolsView: public QWidget, public DockContextHandler, p
 
 	SymbolList* m_funcList;
 	FilteredView* m_funcFilter;
+	QWidget* m_header;
 
 	bool m_updatesPending;
 	QTimer* m_updateTimer;
@@ -48,11 +48,20 @@ public:
 	void toggleLocalFunctions() { m_funcList->toggleLocalFunctions(); }
 	void toggleLocalDataVars() { m_funcList->toggleLocalDataVars(); }
 
+	virtual QWidget* headerWidget() override { return m_header; }
+
 protected:
 	virtual void contextMenuEvent(QContextMenuEvent* event) override;
 	virtual void notifyFontChanged() override;
-	virtual bool shouldBeVisible(ViewFrame* frame) override;
 
 private Q_SLOTS:
 	void updateTimerEvent();
+	void showContextMenu();
+};
+
+class BINARYNINJAUIAPI SymbolsViewSidebarWidgetType: public SidebarWidgetType
+{
+public:
+	SymbolsViewSidebarWidgetType();
+	virtual SidebarWidget* createWidget(ViewFrame* frame, BinaryViewRef data) override;
 };

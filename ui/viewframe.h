@@ -19,6 +19,7 @@
 #include "filecontext.h"
 #include "viewtype.h"
 #include "action.h"
+#include "sidebar.h"
 
 // this struct is used to pass selection information for cross references
 struct SelectionInfoForXref
@@ -221,6 +222,8 @@ public:
 
 	QString viewType();
 
+	void updateCrossReferenceSelection(ViewFrame* frame = nullptr);
+
 	static void registerActions();
 };
 
@@ -307,7 +310,7 @@ private:
 	ClickableStateLabel* m_fileContentsLockStatus;
 	BinaryViewRef m_data;
 	DockHandler* m_docks;
-	QWidget* m_view;
+	QWidget* m_view = nullptr;
 	QWidget* m_viewContainer;
 	QVBoxLayout* m_viewLayout;
 	std::map<QString, std::map<QString, QPointer<QWidget>>> m_extViewCache;
@@ -349,6 +352,7 @@ public:
 	std::vector<QString> getAvailableTypes() const;
 
 	QString getCurrentView() const;
+	BinaryViewRef getCurrentBinaryView() const;
 	QString getCurrentDataType() const;
 	uint64_t getCurrentOffset() const;
 	BNAddressRange getSelectionOffsets() const;
@@ -368,6 +372,20 @@ public:
 	void refreshFeatureMap();
 
 	QWidget* getExtendedView(const QString& name, bool create = false);
+
+	Sidebar* getSidebar();
+
+	template<class T>
+	T* getSidebarWidget(const QString& name)
+	{
+		Sidebar* sidebar = getSidebar();
+		if (!sidebar)
+			return (T*)nullptr;
+		QWidget* widget = sidebar->widget(name);
+		if (!widget)
+			return (T*)nullptr;
+		return qobject_cast<T*>(widget);
+	}
 
 	bool navigate(const QString& type, uint64_t offset, bool updateInfo = true, bool addHistoryEntry = true);
 	bool navigate(const QString& type, const std::function<bool(View*)>& handler, bool updateInfo = true, bool addHistoryEntry = true);
@@ -412,12 +430,11 @@ public:
 
 	void setCurrentFunction(FunctionRef func);
 	void updateCrossReferences();
-	void showCrossReferences();
+	void updateCrossReferenceSelection();
 	void showPinnedCrossReferences();
 	void nextCrossReference();
 	void prevCrossReference();
 
-	void showTags();
 	void editTag(TagRef tag);
 	void nextTag();
 	void prevTag();

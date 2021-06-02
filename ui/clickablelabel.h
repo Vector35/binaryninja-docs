@@ -1,8 +1,21 @@
 #pragma once
 
+#include <QtCore/QTimer>
 #include <QtGui/QColor>
 #include <QtGui/QPainter>
+#include <QtGui/QPaintEvent>
 #include <QtWidgets/QLabel>
+#include "uicontext.h"
+
+
+struct BINARYNINJAUIAPI IconImage
+{
+	QImage original;
+	QImage active, activeHover;
+	QImage inactive, inactiveHover;
+
+	static IconImage generate(const QImage& src);
+};
 
 
 class BINARYNINJAUIAPI ClickableLabel: public QLabel
@@ -16,6 +29,39 @@ Q_SIGNALS:
 	void clicked();
 
 protected:
+	void mouseReleaseEvent(QMouseEvent* event) override { if (event->button() == Qt::LeftButton) Q_EMIT clicked(); }
+};
+
+
+class BINARYNINJAUIAPI ClickableIcon: public QWidget
+{
+	Q_OBJECT
+
+	IconImage m_image;
+	bool m_canToggle = false;
+	bool m_active = true;
+	bool m_hover = false;
+	QTimer* m_timer;
+
+public:
+	ClickableIcon(const QImage& icon, const QSize& desiredPointSize);
+
+	void setAllowToggle(bool canToggle);
+	void setActive(bool state);
+	bool active() const { return m_active; }
+
+Q_SIGNALS:
+	void clicked();
+	void toggle(bool newState);
+
+private Q_SLOTS:
+	void underMouseTimerEvent();
+	void handleToggle();
+
+protected:
+	void enterEvent(QEnterEvent* event) override;
+	void leaveEvent(QEvent* event) override;
+	void paintEvent(QPaintEvent* event) override;
 	void mouseReleaseEvent(QMouseEvent* event) override { if (event->button() == Qt::LeftButton) Q_EMIT clicked(); }
 };
 

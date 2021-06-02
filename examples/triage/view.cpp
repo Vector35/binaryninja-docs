@@ -135,7 +135,8 @@ void TriageView::setSelectionOffsets(BNAddressRange range)
 void TriageView::setCurrentOffset(uint64_t offset)
 {
 	m_currentOffset = offset;
-	UIContext::updateStatus(true);
+	UIContext::updateStatus();
+	updateCrossReferenceSelection();
 }
 
 

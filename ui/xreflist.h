@@ -20,7 +20,7 @@
 #include <memory>
 
 #include "binaryninjaapi.h"
-#include "dockhandler.h"
+#include "sidebar.h"
 #include "viewframe.h"
 #include "fontsettings.h"
 #include "expandablegroup.h"
@@ -452,10 +452,9 @@ Q_SIGNALS:
 
 class ExpandableGroup;
 class QCheckboxCombo;
-class BINARYNINJAUIAPI CrossReferenceWidget: public QWidget, public DockContextHandler
+class BINARYNINJAUIAPI CrossReferenceWidget: public SidebarWidget, public UIContextNotification
 {
 	Q_OBJECT
-	Q_INTERFACES(DockContextHandler)
 
 	ViewFrame* m_view;
 	BinaryViewRef m_data;
@@ -488,11 +487,12 @@ class BINARYNINJAUIAPI CrossReferenceWidget: public QWidget, public DockContextH
 
 public:
 	CrossReferenceWidget(ViewFrame* view, BinaryViewRef data, bool pinned);
+	virtual ~CrossReferenceWidget();
 	virtual void notifyFontChanged() override;
-	virtual bool shouldBeVisible(ViewFrame* frame) override;
 
 	virtual QString getHeaderText(SelectionInfoForXref selectionInfo);
 	virtual void setCurrentSelection(SelectionInfoForXref selectionInfo);
+	virtual void updateCrossReferences();
 	virtual void setCurrentPinnedSelection(SelectionInfoForXref selectionInfo);
 	void updatePinnedSelection();
 	virtual void navigateToNext();
@@ -510,6 +510,11 @@ public:
 	bool uiMaxItemsExceeded() const { return m_uiMaxItemsExceeded; }
 	void setUIMaxItemsExceeded(bool value) { m_uiMaxItemsExceeded = value; }
 
+	virtual void focus() override;
+
+	virtual void OnNewSelectionForXref(UIContext* context, ViewFrame* frame, View* view,
+		const SelectionInfoForXref& selection) override;
+
 private Q_SLOTS:
 	void hoverTimerEvent();
 
@@ -519,6 +524,15 @@ public Q_SLOTS:
 	void selectionChanged();
 	void typeChanged(int index, bool checked);
 	void directionChanged(int change, bool checked);
+};
+
+
+class BINARYNINJAUIAPI CrossReferenceSidebarWidgetType: public SidebarWidgetType
+{
+public:
+	CrossReferenceSidebarWidgetType();
+	virtual bool isInReferenceArea() const override { return true; }
+	virtual SidebarWidget* createWidget(ViewFrame* frame, BinaryViewRef data) override;
 };
 
 

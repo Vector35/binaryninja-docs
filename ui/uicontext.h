@@ -18,6 +18,9 @@ class ViewFrame;
 class UIActionHandler;
 class FileContext;
 class ViewLocation;
+class Sidebar;
+class SidebarWidgetContainer;
+struct SelectionInfoForXref;
 
 /*!
     Interface used to receive notifications related to files and contexts. Many notifications include the ability
@@ -131,13 +134,22 @@ public:
 	    \return True if the value in name should be used
 	 */
 	virtual bool GetNameForPath(UIContext* context, const QString& path, QString& name) { (void)context; (void)path; (void)name; return false; }
+
+	/*!
+	    Callback when the ui changes selection and should update cross references
+	    \param context Context changing selection
+	    \param frame ViewFrame which changed selection
+	    \param view View that changed selection
+	    \param selection New selection
+	 */
+	virtual void OnNewSelectionForXref(UIContext* context, ViewFrame* frame, View* view, const SelectionInfoForXref& selection) { (void)context; (void)frame; (void)view; (void)selection; }
 };
 
 class BINARYNINJAUIAPI UIContextHandler
 {
 public:
 	virtual ~UIContextHandler();
-	virtual void updateStatus(bool updateInfo) = 0;
+	virtual void updateStatus() = 0;
 	virtual void notifyThemeChanged() = 0;
 	virtual void registerFileOpenMode(const QString& buttonName, const QString& description, const QString& action);
 };
@@ -168,6 +180,7 @@ protected:
 
 	void NotifyOnViewChange(ViewFrame* frame, const QString& type);
 	void NotifyOnAddressChange(ViewFrame* frame, View* view, const ViewLocation& location);
+	void NotifyOnNewSelectionForXref(ViewFrame* frame, View* view, const SelectionInfoForXref& selection);
 
 public:
 	UIContext();
@@ -257,6 +270,10 @@ public:
 	UIActionHandler* globalActions() { return &m_globalActions; }
 	virtual UIActionHandler* contentActionHandler() = 0;
 
+	virtual Sidebar* sidebar() = 0;
+
+	void updateCrossReferences(ViewFrame* frame, View* view, const SelectionInfoForXref& selection);
+
 	/*!
 	    Register an object to receive notifications of UIContext events
 	    \param notification Object which will receive notifications
@@ -284,7 +301,7 @@ public:
 	static void setHandler(UIContextHandler* handler);
 
 	static QSize getScaledWindowSize(int x, int y);
-	static void updateStatus(bool updateInfo = true);
+	static void updateStatus();
 	static void notifyThemeChanged();
 	static void showPreview(QWidget* parent, PreviewWidget* preview, QPoint localPos, bool anchorAtPoint = false);
 	static void closePreview();

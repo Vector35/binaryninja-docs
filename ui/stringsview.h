@@ -126,13 +126,15 @@ class BINARYNINJAUIAPI StringsContainer: public QWidget, public ViewContainer
 	ViewFrame* m_view;
 	StringsView* m_strings;
 	FilteredView* m_filter;
+	FilterEdit* m_separateEdit = nullptr;
 
 public:
-	StringsContainer(BinaryViewRef data, ViewFrame* view);
+	StringsContainer(BinaryViewRef data, ViewFrame* view, bool separateEdit = false);
 	virtual View* getView() override { return m_strings; }
 
 	StringsView* getStringsView() { return m_strings; }
 	FilteredView* getFilter() { return m_filter; }
+	FilterEdit* getSeparateFilterEdit() { return m_separateEdit; }
 
 protected:
 	virtual void focusInEvent(QFocusEvent* event) override;
@@ -147,4 +149,23 @@ public:
 	virtual int getPriority(BinaryViewRef data, const QString& filename);
 	virtual QWidget* create(BinaryViewRef data, ViewFrame* viewFrame);
 	static void init();
+};
+
+
+class BINARYNINJAUIAPI StringsViewSidebarWidget: public SidebarWidget
+{
+	Q_OBJECT
+
+	QWidget* m_header;
+public:
+	StringsViewSidebarWidget(BinaryViewRef data, ViewFrame* frame);
+	virtual QWidget* headerWidget() { return m_header; }
+};
+
+
+class BINARYNINJAUIAPI StringsViewSidebarWidgetType: public SidebarWidgetType
+{
+public:
+	StringsViewSidebarWidgetType();
+	virtual SidebarWidget* createWidget(ViewFrame* frame, BinaryViewRef data) override;
 };

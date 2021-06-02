@@ -7,7 +7,7 @@
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QDialog>
 #include "binaryninjaapi.h"
-#include "dockhandler.h"
+#include "sidebar.h"
 #include "viewframe.h"
 #include "filter.h"
 #include "tagtypelist.h"
@@ -176,10 +176,9 @@ public:
 };
 
 
-class BINARYNINJAUIAPI TagListWidget: public QWidget, public DockContextHandler
+class BINARYNINJAUIAPI TagListWidget: public SidebarWidget
 {
 	Q_OBJECT
-	Q_INTERFACES(DockContextHandler)
 
 	ViewFrame* m_view;
 	QTabWidget* m_tabs;
@@ -205,8 +204,10 @@ public:
 	TagList* GetList();
 	void editTag(TagRef tag);
 
-	TagListWidget(QWidget* parent, ViewFrame* view, BinaryViewRef data);
+	TagListWidget(ViewFrame* view, BinaryViewRef data);
 	virtual ~TagListWidget();
+
+	virtual void focus() override;
 };
 
 
@@ -235,4 +236,12 @@ private Q_SLOTS:
 	void createTag();
 	void createTagAccept(TagTypeRef tt);
 	void removeTag();
+};
+
+
+class BINARYNINJAUIAPI TagListSidebarWidgetType: public SidebarWidgetType
+{
+public:
+	TagListSidebarWidgetType();
+	virtual SidebarWidget* createWidget(ViewFrame* frame, BinaryViewRef data) override;
 };
